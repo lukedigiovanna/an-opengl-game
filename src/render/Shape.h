@@ -7,8 +7,8 @@ private:
     unsigned int ebo;
     bool useEbo = false;
 public:
-    Shape(float* vertices, unsigned int numVertices);
-    Shape(float* vertices, unsigned int* indices, unsigned int numVertices);
+    Shape(float* vertices, unsigned int numTriangles);
+    Shape(float* vertices, unsigned int* indices, unsigned int numTriangles);
     ~Shape();
 
     void draw() const;

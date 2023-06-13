@@ -6,10 +6,8 @@
 
 #include "render/Window.h"
 #include "render/Shader.h"
-#include "render/Shape.h"
 #include "render/shapes.h"
-
-void processInput(GLFWwindow *window);;
+#include "render/Shape.h"
 
 int main()
 {
@@ -31,9 +29,10 @@ int main()
         return -1;
     }
 
+    init_shapes();
+
     Shader* shader = new Shader("shaders/vs.glsl", "shaders/fs.glsl");
 
-    init_shapes();
 
     shader->use();
     shader->setUniform2f("screenDimension", 640, 480);
@@ -46,7 +45,7 @@ int main()
 
         float max = 6.28f;
         int idx = 0;
-        Shape* shapes[] = {s_square, s_triangle};
+        Shape* shapes[] = {s_square, s_triangle, s_circle};
         for (float s = 0.0f; s < max; s += max / 20) {
             float f = s + r;
 
@@ -57,7 +56,7 @@ int main()
             shader->setUniform4f("color", 1.0 - (std::sinf(f) * 0.5f + 0.5f), std::cosf(f) * 0.5f + 0.5f, 1.0, 1.0);
 
             shapes[idx++]->draw();
-            idx%=2;
+            idx%=3;
         }
 
 

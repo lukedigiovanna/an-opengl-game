@@ -3,36 +3,12 @@
 
 #include "Shape.h"
 
-static float v_triangle[] = {
-    -0.5f, -0.289f,
-    0.5f, -0.289f,
-    0.0f, 0.578f
-};
+extern Shape* s_triangle; 
+extern Shape* s_square;
+extern Shape* s_circle;
 
+void init_shapes();
 
-static float v_square[] = {
-    -0.5f, -0.5f,
-    0.5f, -0.5f,
-    0.5f, 0.5f,
-    -0.5f, 0.5f
-};
-
-static unsigned int i_square[] = {
-    0, 1, 2,
-    0, 2, 3
-};
-
-Shape* s_triangle; 
-Shape* s_square;
-
-void init_shapes() {
-    s_triangle = new Shape(v_triangle, 3);
-    s_square = new Shape(v_square, i_square, 6);
-}
-
-void destroy_shapes() {
-    delete s_triangle;
-    delete s_square;
-}
+void destroy_shapes();
 
 #endif
