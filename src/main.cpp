@@ -12,6 +12,7 @@
 #include "render/Mesh.h"
 #include "render/Texture.h"
 #include "render/meshes.h"
+#include "render/textures.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -37,9 +38,9 @@ int main()
     }
 
     Shader* shader = new Shader("shaders/vs.glsl", "shaders/fs.glsl");
-    Texture* texture = new Texture("resources/dirt.png");
 
-    init_meshes();
+    textures::init();
+    meshes::init();
 
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), 640.0f / 480.0f, 0.1f, 100.0f);
 
@@ -65,7 +66,7 @@ int main()
         shader->setUniformMatrix4fv("transform", trans);
 
         // texture->bind();
-        m_circle->render();
+        meshes::CIRCLE->render();
         // texture->unbind();
         
         window->swapBuffers();
@@ -73,7 +74,10 @@ int main()
         glfwPollEvents();
     }
 
-    destroy_meshes();
+    // Clean up resources
+
+    meshes::destroy();
+    textures::destroy();
 
     delete shader;
     delete window;

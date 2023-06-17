@@ -3,12 +3,14 @@
 
 #include "Mesh.h"
 
-extern Mesh* m_cube; 
-extern Mesh* m_square; 
-extern Mesh* m_circle; 
+namespace meshes {
+extern Mesh* CUBE; 
+extern Mesh* SQUARE; 
+extern Mesh* CIRCLE; 
 
-void init_meshes();
+void init();
 
-void destroy_meshes();
+void destroy();
+}
 
 #endif

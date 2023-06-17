@@ -1,5 +1,6 @@
 #include "Mesh.h"
 #include <glad/glad.h>
+#include "textures.h"
 
 // Layout of each vertex is always
 // [x][y][z] | [tx][ty]
@@ -36,9 +37,16 @@ Mesh::Mesh(float* vertexData, unsigned int* indices, unsigned int numVertices, u
 Mesh::~Mesh() {
     glDeleteVertexArrays(1, &this->vao);
     glDeleteBuffers(1, &this->vbo);
+    glDeleteBuffers(1, &this->ebo);
 }
 
 void Mesh::render() const {
+    GLint textureBinding;
+    glGetIntegerv(GL_TEXTURE_BINDING_2D, &textureBinding);
+    if (textureBinding == 0) {
+        // bind the blank texture then
+        textures::BLANK->bind();
+    }
     // bind the vao
     glBindVertexArray(this->vao);
     // draw

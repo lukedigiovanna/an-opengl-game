@@ -4,10 +4,12 @@
 
 #include "Texture.h";
 
+namespace textures {
 extern Texture* BLANK;
 extern Texture* DIRT_BLOCK;
 
-void init_textures();
-void destroy_textures();
+void init();
+void destroy();
+}
 
 #endif

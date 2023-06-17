@@ -20,6 +20,10 @@ Texture::Texture(std::string const& imagePath) {
     this->unbind();
 }
 
+Texture::~Texture() {
+    glDeleteTextures(1, &this->texture);
+}
+
 void Texture::bind() const {
     glBindTexture(GL_TEXTURE_2D, this->texture);
 }

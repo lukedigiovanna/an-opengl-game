@@ -1,5 +1,7 @@
 #include "meshes.h"
 
+using namespace meshes;
+
 static float v_square[] = {
     -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
     0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
@@ -46,18 +48,14 @@ static unsigned int i_cube[] = {
     0, 5, 4
 };
 
-Mesh* m_cube; 
-Mesh* m_square; 
-Mesh* m_circle;
-
-void init_meshes() {
-    m_square = new Mesh(v_square, i_square, 4, 2);
-    m_circle = new Mesh(v_circle, i_circle, 21, 21);
-    m_cube = new Mesh(v_cube, i_cube, 8, 12);
+void meshes::init() {
+    SQUARE = new Mesh(v_square, i_square, 4, 2);
+    CIRCLE = new Mesh(v_circle, i_circle, 21, 21);
+    CUBE = new Mesh(v_cube, i_cube, 8, 12);
 }
 
-void destroy_meshes() {
-    delete m_square;
-    delete m_circle;
-    delete m_cube;
+void meshes::destroy() {
+    delete SQUARE;
+    delete CIRCLE;
+    delete CUBE;
 }
