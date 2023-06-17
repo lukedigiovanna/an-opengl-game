@@ -5,3 +5,6 @@
 /dependencies
 
 app
+
+src/stb_image.h
+src/glad.c

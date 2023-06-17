@@ -3,6 +3,7 @@
 #include "../utils/io.h"
 
 #include <glad/glad.h>
+#include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 
 unsigned int compileShader(std::string const& filepath, int shaderType) {
@@ -68,4 +69,9 @@ void Shader::setUniform3f(const char* uniformName, float v0, float v1, float v2)
 void Shader::setUniform4f(const char* uniformName, float v0, float v1, float v2, float v3) const {
     unsigned int loc = glGetUniformLocation(this->program, uniformName);
     glUniform4f(loc, v0, v1, v2, v3);
+}
+
+void Shader::setUniformMatrix4fv(const char* uniformName, glm::mat4& matrix) {
+    unsigned int loc = glGetUniformLocation(this->program, uniformName);
+    glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(matrix));
 }

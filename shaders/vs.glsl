@@ -1,20 +1,18 @@
 #version 330 core
 
-layout (location = 0) in vec2 aPos;
+layout (location = 0) in vec3 inPos;
+layout (location = 1) in vec2 inTexCoord;
 
-uniform vec2 position;
-uniform vec2 dimension;
+out vec2 TexCoord;
 
-uniform vec2 screenDimension;
-
-uniform float rotation;
+uniform mat4 projection;
+uniform mat4 view;
+uniform mat4 transform;
 
 void main() {
-    mat2 rotationMatrix = mat2(
-        cos(rotation), -sin(rotation),
-        sin(rotation), cos(rotation)
-    );
+    TexCoord = inTexCoord;
+    
+    vec4 pos = projection * view * transform * vec4(inPos, 1.0);
 
-    vec2 sPos = (rotationMatrix * aPos.xy * dimension.xy + position) / (screenDimension.xy / 2);
-    gl_Position = vec4(sPos.x, sPos.y, 0, 1.0);
+    gl_Position = pos;
 }

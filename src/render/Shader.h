@@ -1,6 +1,7 @@
 #ifndef H_SHADER
 #define H_SHADER
 #include <string>
+#include <glm/glm.hpp>
 
 class Shader {
 private:
@@ -15,6 +16,7 @@ public:
     void setUniform2f(const char* uniformName, float v0, float v1) const;
     void setUniform3f(const char* uniformName, float v0, float v1, float v2) const;
     void setUniform4f(const char* uniformName, float v0, float v1, float v2, float v3) const;
+    void setUniformMatrix4fv(const char* uniformName, glm::mat4& matrix);
 };
 
 #endif
