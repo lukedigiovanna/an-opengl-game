@@ -2,7 +2,7 @@ import math
 
 vertices = [0, 0, 0, 0.5, 0.5]
 
-N = 20
+N = 40
 for i in range(N):
     angle = i / N * 2 * math.pi
     x = math.cos(angle) * 0.5

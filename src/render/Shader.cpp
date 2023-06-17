@@ -71,7 +71,7 @@ void Shader::setUniform4f(const char* uniformName, float v0, float v1, float v2,
     glUniform4f(loc, v0, v1, v2, v3);
 }
 
-void Shader::setUniformMatrix4fv(const char* uniformName, glm::mat4& matrix) {
+void Shader::setUniformMatrix4fv(const char* uniformName, const glm::mat4& matrix) const {
     unsigned int loc = glGetUniformLocation(this->program, uniformName);
     glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(matrix));
 }

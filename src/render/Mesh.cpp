@@ -6,14 +6,18 @@
 // [x][y][z] | [tx][ty]
 
 #define NUM_ELEMENTS_PER_VERTEX 5
-#define NUM_DIMENSIONS 3
 
 Mesh::Mesh(float* vertexData, unsigned int* indices, unsigned int numVertices, unsigned int numTriangles) {
+    if (indices != nullptr) {
+        this->useEbo = true;
+    }
     this->numIndices = numTriangles * 3;
+    this->numTriangles = numTriangles;
 
     glGenVertexArrays(1, &this->vao);
     glGenBuffers(1, &this->vbo);
-    glGenBuffers(1, &this->ebo);
+    if (this->useEbo)
+        glGenBuffers(1, &this->ebo);
 
     glBindVertexArray(this->vao);
 
@@ -21,10 +25,13 @@ Mesh::Mesh(float* vertexData, unsigned int* indices, unsigned int numVertices, u
     glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * NUM_ELEMENTS_PER_VERTEX * numVertices, vertexData, GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * this->numIndices, indices, GL_STATIC_DRAW);
+    // set up index buffer, if we are using that
+    if (this->useEbo) {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * this->numIndices, indices, GL_STATIC_DRAW);
+    }
 
-    glVertexAttribPointer(0, NUM_DIMENSIONS, GL_FLOAT, GL_FALSE, NUM_ELEMENTS_PER_VERTEX * sizeof(float), (void*) 0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, NUM_ELEMENTS_PER_VERTEX * sizeof(float), (void*) 0);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, NUM_ELEMENTS_PER_VERTEX * sizeof(float), (void*) (3 * sizeof(float)));
     glEnableVertexAttribArray(1);
@@ -34,10 +41,13 @@ Mesh::Mesh(float* vertexData, unsigned int* indices, unsigned int numVertices, u
     glBindVertexArray(0);
 }
 
+Mesh::Mesh(float* vertexData, unsigned int numTriangles) : Mesh(vertexData, nullptr, numTriangles * 3, numTriangles) {}
+
 Mesh::~Mesh() {
     glDeleteVertexArrays(1, &this->vao);
     glDeleteBuffers(1, &this->vbo);
-    glDeleteBuffers(1, &this->ebo);
+    if (this->useEbo)
+        glDeleteBuffers(1, &this->ebo);
 }
 
 void Mesh::render() const {
@@ -50,9 +60,14 @@ void Mesh::render() const {
     // bind the vao
     glBindVertexArray(this->vao);
     // draw
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ebo);
-    glDrawElements(GL_TRIANGLES, this->numIndices, GL_UNSIGNED_INT, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    if (this->useEbo) {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ebo);
+        glDrawElements(GL_TRIANGLES, this->numIndices, GL_UNSIGNED_INT, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    }
+    else {
+        glDrawArrays(GL_TRIANGLES, 0, this->numIndices);
+    }
     // unbind the vao
     glBindVertexArray(0);
 }

@@ -2,6 +2,7 @@
 #define H_WINDOW
 
 #include <string>
+#include <map>
 #include <GLFW/glfw3.h>
 
 class Window {
@@ -13,6 +14,8 @@ public:
 
     bool shouldClose() const;
     void swapBuffers() const;
+
+    bool isKeyDown(int keycode) const;
 };
 
 #endif

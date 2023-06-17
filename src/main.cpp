@@ -2,7 +2,6 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 #include <iostream>
 #include <chrono>
@@ -13,13 +12,15 @@
 #include "render/Texture.h"
 #include "render/meshes.h"
 #include "render/textures.h"
+#include "render/Camera.h"
+
+#include "utils/keyboard.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
 int main()
 {
-    
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -29,7 +30,7 @@ int main()
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
-    Window* window = new Window("Game", 640, 480);
+    Window window = Window("Game", 640, 480);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
@@ -37,39 +38,76 @@ int main()
         return -1;
     }
 
-    Shader* shader = new Shader("shaders/vs.glsl", "shaders/fs.glsl");
+    Shader shader = Shader("shaders/vs.glsl", "shaders/fs.glsl");
+
+    Camera camera;
 
     textures::init();
     meshes::init();
 
-    glm::mat4 projection = glm::perspective(glm::radians(45.0f), 640.0f / 480.0f, 0.1f, 100.0f);
-
-    shader->use();
+    shader.use();
     glEnable(GL_DEPTH_TEST);
 
-    while (!window->shouldClose()) {
+    while (!window.shouldClose()) {
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        
-        glm::mat4 view(1.0f);
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -4.0f + std::sinf(glfwGetTime())));
+
+        glm::vec3 movement(0.0f);
+        if (isKeyDown(GLFW_KEY_A)) {
+            movement.x -= 1;
+        }
+        if (isKeyDown(GLFW_KEY_D)) {
+            movement.x += 1;
+        }
+        if (isKeyDown(GLFW_KEY_W)) {
+            movement.z += 1;
+        }
+        if (isKeyDown(GLFW_KEY_S)) {
+            movement.z -= 1;
+        }
+        if (isKeyDown(GLFW_KEY_SPACE)) {
+            movement.y += 1;
+        }
+        if (isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
+            movement.y -= 1;
+        }
+        if (isKeyDown(GLFW_KEY_LEFT)) {
+            camera.rotateYaw(-1.0f);
+        }
+        if (isKeyDown(GLFW_KEY_RIGHT)) {
+            camera.rotateYaw(1.0f);
+        }
+        if (isKeyDown(GLFW_KEY_UP)) {
+            camera.rotatePitch(1.0f);
+        }
+        if (isKeyDown(GLFW_KEY_DOWN)) {
+            camera.rotatePitch(-1.0f);
+        }
+        float speed = 0.03f;
+        movement = speed * movement;
+        camera.move(movement);
+
+        camera.setMatrices(shader);
 
         float r = glfwGetTime();
-        glm::mat4 trans(1.0f);
-        trans = glm::translate(trans, glm::vec3(0.5f, 0.0f, 0.0f));
-        trans = glm::rotate(trans, r, glm::vec3(0.707f, 0.707f, 0));
-        // trans = glm::scale(trans, glm::vec3(sr, sr, 1));
-        // shader->setUniform4f("color", 1.0 - (std::sinf(r) * 0.5f + 0.5f), std::cosf(r) * 0.5f + 0.5f, 1.0, 1.0);
-        shader->setUniform4f("color", 1.0, 1.0, 1.0, 1.0);
-        shader->setUniformMatrix4fv("projection", projection);
-        shader->setUniformMatrix4fv("view", view);
-        shader->setUniformMatrix4fv("transform", trans);
 
-        // texture->bind();
-        meshes::CIRCLE->render();
-        // texture->unbind();
+        shader.setUniform4f("color", 1.0, 1.0, 1.0, 1.0);
+        Texture* texts[] = {textures::DIRT_BLOCK, textures::EMERALD_BLOCK};
+        int idx = 0;
+        for (float x = -10.0f; x <= 10.0f; x += 1.0f) {
+            for (float z = -10.0f; z <= 10.0f; z += 1.0f) {
+                glm::mat4 trans(1.0f);
+                trans = glm::translate(trans, glm::vec3(x, 0.0f, z));
+                // trans = glm::rotate(trans, r, glm::vec3(0.0f, 1.0f, 0.0f));
+                // trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
+                shader.setUniformMatrix4fv("transform", trans);
+                texts[idx]->bind();
+                idx = (idx + 1) % 2;
+                meshes::CUBE->render();
+            }
+        }
         
-        window->swapBuffers();
+        window.swapBuffers();
 
         glfwPollEvents();
     }
@@ -78,9 +116,6 @@ int main()
 
     meshes::destroy();
     textures::destroy();
-
-    delete shader;
-    delete window;
 
     return 0;
 }

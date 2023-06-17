@@ -10,7 +10,7 @@ uniform mat4 view;
 uniform mat4 transform;
 
 void main() {
-    TexCoord = inTexCoord;
+    TexCoord = TexCoord = vec2(inTexCoord.x, 1.0 - inTexCoord.y);
     
     vec4 pos = projection * view * transform * vec4(inPos, 1.0);
 

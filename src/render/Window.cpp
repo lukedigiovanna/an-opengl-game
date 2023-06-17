@@ -1,6 +1,6 @@
 #include "Window.h"
+#include "../utils/keyboard.h"
 
-// #include <glad/glad.h>
 #include <iostream>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
@@ -17,6 +17,7 @@ Window::Window(std::string const& windowTitle, int width, int height) {
 
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    setKeyCallback(this->window);
 }
 
 Window::~Window() {
