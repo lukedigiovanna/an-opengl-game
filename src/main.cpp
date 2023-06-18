@@ -14,6 +14,7 @@
 #include "render/textures.h"
 #include "render/Camera.h"
 #include "render/Light.h"
+#include "render/LightHandler.h"
 
 #include "utils/keyboard.h"
 
@@ -45,7 +46,23 @@ int main()
     Camera camera;
     camera.setPosition(glm::vec3(0.0f, 2.0f, 0.0f));
 
-    Light light(glm::vec3(3.0f, 4.0f, 0.0f), glm::vec3(1.0f,1.0f,1.0f), 0.1f);
+    // DirectionalLight light(glm::vec3(-0.2f, -1.0f, -0.3f));
+
+    LightHandler lights;
+    PointLight light0(glm::vec3(-5.0f, 1.0f, -5.0f));
+    PointLight light1(glm::vec3(5.0f, 1.0f, -5.0f));
+    PointLight light2(glm::vec3(-5.0f, 1.0f, 5.0f));
+    PointLight light3(glm::vec3(5.0f, 1.0f, 5.0f));
+
+    PointLight light(glm::vec3(0.0f, 2.0f, 0.0f));
+
+    light.setColor(glm::vec3(1.0, 0.2, 0.8));
+
+    lights.add(light0);
+    lights.add(light1);
+    lights.add(light2);
+    lights.add(light3);
+    lights.add(light);
 
     textures::init();
     meshes::init();
@@ -55,6 +72,14 @@ int main()
     while (!window.shouldClose()) {
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        light.setColor(glm::vec3(sin(glfwGetTime()) * 0.5f + 0.5f, 0.1f, 0.8f));
+
+        float r = glfwGetTime() * 30;
+        light0.setPosition(glm::vec3(cos(glm::radians(r)) * 5.0f, 1.0f, sin(glm::radians(r)) * 5.0f));
+        light1.setPosition(glm::vec3(cos(glm::radians(r + 90)) * 5.0f, 1.0f, sin(glm::radians(r + 90)) * 5.0f));
+        light2.setPosition(glm::vec3(cos(glm::radians(r + 180)) * 5.0f, 1.0f, sin(glm::radians(r + 180)) * 5.0f));
+        light3.setPosition(glm::vec3(cos(glm::radians(r + 270)) * 5.0f, 1.0f, sin(glm::radians(r + 270)) * 5.0f));
 
         glm::vec3 movement(0.0f);
         if (isKeyDown(GLFW_KEY_A)) {
@@ -93,9 +118,8 @@ int main()
 
         shader.use();
         camera.setMatrices(shader);
-        shader.setFloat("ambientStrength", light.ambientStrength);
-        shader.setVec3("lightColor", light.color);
-        shader.setVec3("lightPosition", light.position);
+
+        lights.set(shader);
 
         shader.setVec3("viewPosition", camera.getPosition());
 
@@ -103,15 +127,15 @@ int main()
         int idx = 0;
 
         shader.setVec3("objectColor", 1.0f, 1.0f, 1.0f);
-        for (float x = -10.0f; x <= 10.0f; x += 0.5f) {
-            for (float z = -10.0f; z <= 10.0f; z += 0.5f) {
+        for (float x = -10.0f; x <= 10.0f; x += 0.25f) {
+            for (float z = -10.0f; z <= 10.0f; z += 0.25f) {
                 glm::mat4 trans(1.0f);
-                trans = glm::translate(trans, glm::vec3(x, sin(x) + cos(z), z));
-                trans = glm::rotate(trans, (float) glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
-                trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
+                trans = glm::translate(trans, glm::vec3(x, (x * x + z * z) * 0.0f, z));
+                // trans = glm::rotate(trans, (float) glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
+                trans = glm::scale(trans, glm::vec3(0.25f, 0.25f, 0.25f));
                 shader.setMatrix4("model", trans);
 
-                texts[idx]->bind();
+                // texts[idx]->bind();
                 idx = (idx + 1) % 2;
                 
                 meshes::CUBE->render();
@@ -121,8 +145,8 @@ int main()
         // draw the light source
         lightShader.use();
         camera.setMatrices(lightShader);
-        light.render(lightShader);
-
+        
+        lights.render(lightShader);
         
         window.swapBuffers();
 
@@ -136,49 +160,3 @@ int main()
 
     return 0;
 }
-
-
-
-float vertices[] = {
-    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
-     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
-     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
-    -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
-    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
-
-    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-
-    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-    -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-    -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-
-     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-     0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-
-    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-
-    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-     0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
-};

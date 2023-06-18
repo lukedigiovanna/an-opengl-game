@@ -3,10 +3,10 @@
 using namespace meshes;
 
 static float v_square[] = {
-    -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
-    0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-    0.5f, 0.5f, 0.0f, 1.0f, 1.0f,
-    -0.5f, 0.5f, 0.0f, 0.0f, 1.0f
+    -0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 0.0f,
+     0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  1.0f, 0.0f,
+     0.5f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  1.0f, 1.0f,
+    -0.5f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 1.0f
 };
 
 static unsigned int i_square[] = {
