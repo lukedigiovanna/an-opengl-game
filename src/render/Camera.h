@@ -6,8 +6,8 @@
 
 class Camera {
 private:
-    glm::vec3 position;
     glm::mat4 projection;
+    glm::vec3 position;
     float yaw;
     float pitch;
 
@@ -16,6 +16,8 @@ private:
 public:
     Camera();
     ~Camera();
+
+    glm::vec3 getPosition() const;
 
     // Moves true to the world coordinates
     void translate(glm::vec3& vec);

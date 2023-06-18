@@ -11,6 +11,10 @@ Camera::~Camera() {
 
 }
 
+glm::vec3 Camera::getPosition() const {
+    return this->position;
+}
+
 void Camera::clampPitch() {
     this->pitch = std::clamp(this->pitch, -89.0f, 89.0f);
 }
@@ -33,6 +37,10 @@ void Camera::translateHorizontal(float right, float forward) {
 void Camera::move(glm::vec3& vec) {
     translateY(vec.y);
     translateHorizontal(vec.x, vec.z);
+}
+
+void Camera::setPosition(glm::vec3 position) {
+    this->position = position;
 }
 
 void Camera::setRotation(float yaw, float pitch) {
@@ -62,7 +70,7 @@ glm::mat4 Camera::getViewMatrix() const {
 }
 
 void Camera::setMatrices(Shader& shader) const {
-    shader.setUniformMatrix4fv("projection", this->projection);
+    shader.setMatrix4("projection", this->projection);
     glm::mat4 view = this->getViewMatrix();
-    shader.setUniformMatrix4fv("view", view);
+    shader.setMatrix4("view", view);
 }

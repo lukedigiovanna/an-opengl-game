@@ -3,9 +3,9 @@
 #include "textures.h"
 
 // Layout of each vertex is always
-// [x][y][z] | [tx][ty]
+// [x][y][z] | [nx] [ny] [nz] | [tx][ty]
 
-#define NUM_ELEMENTS_PER_VERTEX 5
+#define NUM_ELEMENTS_PER_VERTEX 8
 
 Mesh::Mesh(float* vertexData, unsigned int* indices, unsigned int numVertices, unsigned int numTriangles) {
     if (indices != nullptr) {
@@ -33,8 +33,10 @@ Mesh::Mesh(float* vertexData, unsigned int* indices, unsigned int numVertices, u
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, NUM_ELEMENTS_PER_VERTEX * sizeof(float), (void*) 0);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, NUM_ELEMENTS_PER_VERTEX * sizeof(float), (void*) (3 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, NUM_ELEMENTS_PER_VERTEX * sizeof(float), (void*) (3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, NUM_ELEMENTS_PER_VERTEX * sizeof(float), (void*) (6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);

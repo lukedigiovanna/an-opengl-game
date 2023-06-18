@@ -12,11 +12,12 @@ public:
 
     void use() const;
 
-    void setUniform1f(const char* uniformName, float v0) const;
-    void setUniform2f(const char* uniformName, float v0, float v1) const;
-    void setUniform3f(const char* uniformName, float v0, float v1, float v2) const;
-    void setUniform4f(const char* uniformName, float v0, float v1, float v2, float v3) const;
-    void setUniformMatrix4fv(const char* uniformName, const glm::mat4& matrix) const;
+    void setFloat(const char* uniformName, float v0) const;
+    void setVec2(const char* uniformName, float v0, float v1) const;
+    void setVec3(const char* uniformName, float v0, float v1, float v2) const;
+    void setVec3(const char* uniformName, glm::vec3 vec) const;
+    void setVec4(const char* uniformName, float v0, float v1, float v2, float v3) const;
+    void setMatrix4(const char* uniformName, const glm::mat4& matrix) const;
 };
 
 #endif

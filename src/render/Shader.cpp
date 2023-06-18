@@ -51,27 +51,31 @@ void Shader::use() const {
     glUseProgram(this->program);
 }
 
-void Shader::setUniform1f(const char* uniformName, float v0) const {
+void Shader::setFloat(const char* uniformName, float v0) const {
     unsigned int loc = glGetUniformLocation(this->program, uniformName);
     glUniform1f(loc, v0);
 }
 
-void Shader::setUniform2f(const char* uniformName, float v0, float v1) const {
+void Shader::setVec2(const char* uniformName, float v0, float v1) const {
     unsigned int loc = glGetUniformLocation(this->program, uniformName);
     glUniform2f(loc, v0, v1);
 }
 
-void Shader::setUniform3f(const char* uniformName, float v0, float v1, float v2) const {
+void Shader::setVec3(const char* uniformName, float v0, float v1, float v2) const {
     unsigned int loc = glGetUniformLocation(this->program, uniformName);
     glUniform3f(loc, v0, v1, v2);
 }
 
-void Shader::setUniform4f(const char* uniformName, float v0, float v1, float v2, float v3) const {
+void Shader::setVec3(const char* uniformName, glm::vec3 vec) const {
+    this->setVec3(uniformName, vec.x, vec.y, vec.z);
+}
+
+void Shader::setVec4(const char* uniformName, float v0, float v1, float v2, float v3) const {
     unsigned int loc = glGetUniformLocation(this->program, uniformName);
     glUniform4f(loc, v0, v1, v2, v3);
 }
 
-void Shader::setUniformMatrix4fv(const char* uniformName, const glm::mat4& matrix) const {
+void Shader::setMatrix4(const char* uniformName, const glm::mat4& matrix) const {
     unsigned int loc = glGetUniformLocation(this->program, uniformName);
     glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(matrix));
 }

@@ -13,6 +13,7 @@
 #include "render/meshes.h"
 #include "render/textures.h"
 #include "render/Camera.h"
+#include "render/Light.h"
 
 #include "utils/keyboard.h"
 
@@ -39,13 +40,16 @@ int main()
     }
 
     Shader shader = Shader("shaders/vs.glsl", "shaders/fs.glsl");
+    Shader lightShader = Shader("shaders/lighting_vs.glsl", "shaders/lighting_fs.glsl");
 
     Camera camera;
+    camera.setPosition(glm::vec3(0.0f, 2.0f, 0.0f));
+
+    Light light(glm::vec3(3.0f, 4.0f, 0.0f), glm::vec3(1.0f,1.0f,1.0f), 0.1f);
 
     textures::init();
     meshes::init();
 
-    shader.use();
     glEnable(GL_DEPTH_TEST);
 
     while (!window.shouldClose()) {
@@ -87,25 +91,38 @@ int main()
         movement = speed * movement;
         camera.move(movement);
 
+        shader.use();
         camera.setMatrices(shader);
+        shader.setFloat("ambientStrength", light.ambientStrength);
+        shader.setVec3("lightColor", light.color);
+        shader.setVec3("lightPosition", light.position);
 
-        float r = glfwGetTime();
+        shader.setVec3("viewPosition", camera.getPosition());
 
-        shader.setUniform4f("color", 1.0, 1.0, 1.0, 1.0);
         Texture* texts[] = {textures::DIRT_BLOCK, textures::EMERALD_BLOCK};
         int idx = 0;
-        for (float x = -10.0f; x <= 10.0f; x += 1.0f) {
-            for (float z = -10.0f; z <= 10.0f; z += 1.0f) {
+
+        shader.setVec3("objectColor", 1.0f, 1.0f, 1.0f);
+        for (float x = -10.0f; x <= 10.0f; x += 0.5f) {
+            for (float z = -10.0f; z <= 10.0f; z += 0.5f) {
                 glm::mat4 trans(1.0f);
-                trans = glm::translate(trans, glm::vec3(x, 0.0f, z));
-                // trans = glm::rotate(trans, r, glm::vec3(0.0f, 1.0f, 0.0f));
-                // trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
-                shader.setUniformMatrix4fv("transform", trans);
+                trans = glm::translate(trans, glm::vec3(x, sin(x) + cos(z), z));
+                trans = glm::rotate(trans, (float) glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
+                trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
+                shader.setMatrix4("model", trans);
+
                 texts[idx]->bind();
                 idx = (idx + 1) % 2;
+                
                 meshes::CUBE->render();
             }
         }
+
+        // draw the light source
+        lightShader.use();
+        camera.setMatrices(lightShader);
+        light.render(lightShader);
+
         
         window.swapBuffers();
 
@@ -119,3 +136,49 @@ int main()
 
     return 0;
 }
+
+
+
+float vertices[] = {
+    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
+     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
+     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
+    -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
+    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
+
+    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+
+    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+    -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+    -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+
+     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+     0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+
+    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+
+    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+     0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
+};
