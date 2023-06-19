@@ -4,7 +4,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <iostream>
-#include <chrono>
+#include <vector>
 
 #include "render/Window.h"
 #include "render/Shader.h"
@@ -16,7 +16,10 @@
 #include "render/Light.h"
 #include "render/LightHandler.h"
 
+#include "game/WorldObject.h"
+
 #include "utils/keyboard.h"
+#include "utils/random.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -68,6 +71,13 @@ int main()
     meshes::init();
 
     glEnable(GL_DEPTH_TEST);
+
+    std::vector<WorldObject> roses;
+    for (int i = 0; i < 50; i++) {
+        roses.push_back(
+            WorldObject(glm::vec3(randomf(-10.0f, 10.0f), 0.25f, randomf(-10.0f, 10.0f)), glm::vec3(0.5f,0.5f,0.5f), glm::vec3(1.0f), textures::ROSE, meshes::SQUARE)
+        );
+    }
 
     while (!window.shouldClose()) {
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -130,17 +140,21 @@ int main()
         for (float x = -10.0f; x <= 10.0f; x += 0.25f) {
             for (float z = -10.0f; z <= 10.0f; z += 0.25f) {
                 glm::mat4 trans(1.0f);
-                trans = glm::translate(trans, glm::vec3(x, (x * x + z * z) * 0.0f, z));
-                // trans = glm::rotate(trans, (float) glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
+                trans = glm::translate(trans, glm::vec3(x, -0.125f, z));
                 trans = glm::scale(trans, glm::vec3(0.25f, 0.25f, 0.25f));
                 shader.setMatrix4("model", trans);
 
-                // texts[idx]->bind();
+                texts[idx]->bind();
                 idx = (idx + 1) % 2;
                 
                 meshes::CUBE->render();
             }
         }
+
+        for (WorldObject& rose : roses) {
+            rose.render(shader);
+        }
+
 
         // draw the light source
         lightShader.use();

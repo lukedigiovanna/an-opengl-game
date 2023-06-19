@@ -20,7 +20,7 @@ Texture::Texture(std::string const& imagePath) {
 
     // load the texture data
     GLenum format = this->nrChannels == 3 ? GL_RGB : GL_RGBA;
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, this->width, this->height, 0, format, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, this->width, this->height, 0, format, GL_UNSIGNED_BYTE, data);
     
     glGenerateMipmap(GL_TEXTURE_2D);
     stbi_image_free(this->data);

@@ -4,6 +4,8 @@
 
 /dependencies
 
+/.VSCodeCounter
+
 app
 
 src/stb_image.h

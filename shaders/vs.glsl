@@ -18,7 +18,7 @@ void main() {
 
     gl_Position = pos;
 
-    TexCoord = TexCoord = vec2(inTexCoord.x, 1.0 - inTexCoord.y);
+    TexCoord = inTexCoord;
     Normal = mat3(transpose(inverse(model))) * inNormal;  
     FragPos = vec3(model * vec4(inPos, 1.0));
 }

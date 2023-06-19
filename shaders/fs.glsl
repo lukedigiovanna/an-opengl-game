@@ -28,6 +28,9 @@ uniform vec3 objectColor;
 out vec4 FragColor;
 void main() {
     vec4 texColor = texture(ourTexture, TexCoord);
+
+    if (texColor.a < 0.1) 
+        discard;
     
     vec3 norm = normalize(Normal);
 
