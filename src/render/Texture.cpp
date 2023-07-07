@@ -4,12 +4,13 @@
 #include <iostream>
 
 Texture::Texture(std::string const& imagePath) {
-    this->data = stbi_load(imagePath.c_str(), &this->width, &this->height, &this->nrChannels, 0);
-    if (!this->data) {
+    unsigned char* data = stbi_load(imagePath.c_str(), &this->width, &this->height, &this->nrChannels, 0);
+    if (!data) {
         std::cout << "Failed to load texture" << std::endl;
         return;
     }
     glGenTextures(1, &this->texture);
+    std::cout << imagePath << ": " << &this->texture << " " << this->texture << std::endl;
     glBindTexture(GL_TEXTURE_2D, this->texture);
     
     // set parameters
@@ -23,13 +24,20 @@ Texture::Texture(std::string const& imagePath) {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, this->width, this->height, 0, format, GL_UNSIGNED_BYTE, data);
     
     glGenerateMipmap(GL_TEXTURE_2D);
-    stbi_image_free(this->data);
+    stbi_image_free(data);
 
     this->unbind();
 }
 
+Texture::Texture() {
+    // leaves all data unitialized.
+    // this constructor is useful for statically allocating
+    // textures objects and then later reassigning their
+    // memory to an allocated texture.
+}
+
 Texture::~Texture() {
-    glDeleteTextures(1, &this->texture);
+    // glDeleteTextures(1, &this->texture);
 }
 
 void Texture::bind() const {

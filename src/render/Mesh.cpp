@@ -57,7 +57,7 @@ void Mesh::render() const {
     glGetIntegerv(GL_TEXTURE_BINDING_2D, &textureBinding);
     if (textureBinding == 0) {
         // bind the blank texture then
-        textures::BLANK->bind();
+        textures::BLANK.bind();
     }
     // bind the vao
     glBindVertexArray(this->vao);

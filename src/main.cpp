@@ -18,8 +18,14 @@
 
 #include "game/WorldObject.h"
 
+#include "game/Chunk.h"
+
 #include "utils/keyboard.h"
 #include "utils/random.h"
+
+// #include <assimp/Importer.hpp>
+// #include <assimp/scene.h>
+// #include <assimp/postprocess.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -49,6 +55,10 @@ int main()
     Camera camera;
     camera.setPosition(glm::vec3(0.0f, 2.0f, 0.0f));
 
+    // Assimp::Importer importer;
+    // importer.ReadFile("resources/models/backpack/backpack.obj");
+    // importer.ReadFile("resources/models/backpack/backpack.obj", 0);
+
     // DirectionalLight light(glm::vec3(-0.2f, -1.0f, -0.3f));
 
     LightHandler lights;
@@ -67,15 +77,27 @@ int main()
     lights.add(light3);
     lights.add(light);
 
+    Chunk chunk;
+
+    chunk.generate(0, 0, 0);
+
+    std::cout << &textures::DIRT_BLOCK << std::endl;
+    std::cout << &textures::EMERALD_BLOCK << std::endl;
+    std::cout << &textures::ROSE << std::endl;
+
     textures::init();
     meshes::init();
+
+    std::cout << &textures::DIRT_BLOCK << std::endl;
+    std::cout << &textures::EMERALD_BLOCK << std::endl;
+    std::cout << &textures::ROSE << std::endl;
 
     glEnable(GL_DEPTH_TEST);
 
     std::vector<WorldObject> roses;
     for (int i = 0; i < 50; i++) {
         roses.push_back(
-            WorldObject(glm::vec3(randomf(-10.0f, 10.0f), 0.25f, randomf(-10.0f, 10.0f)), glm::vec3(0.5f,0.5f,0.5f), glm::vec3(1.0f), textures::ROSE, meshes::SQUARE)
+            WorldObject(glm::vec3(randomf(-10.0f, 10.0f), 0.25f, randomf(-10.0f, 10.0f)), glm::vec3(0.5f,0.5f,0.5f), glm::vec3(1.0f), &textures::ROSE, meshes::SQUARE)
         );
     }
 
@@ -132,24 +154,16 @@ int main()
         lights.set(shader);
 
         shader.setVec3("viewPosition", camera.getPosition());
-
-        Texture* texts[] = {textures::DIRT_BLOCK, textures::EMERALD_BLOCK};
-        int idx = 0;
-
         shader.setVec3("objectColor", 1.0f, 1.0f, 1.0f);
-        for (float x = -10.0f; x <= 10.0f; x += 0.25f) {
-            for (float z = -10.0f; z <= 10.0f; z += 0.25f) {
-                glm::mat4 trans(1.0f);
-                trans = glm::translate(trans, glm::vec3(x, -0.125f, z));
-                trans = glm::scale(trans, glm::vec3(0.25f, 0.25f, 0.25f));
-                shader.setMatrix4("model", trans);
 
-                texts[idx]->bind();
-                idx = (idx + 1) % 2;
-                
-                meshes::CUBE->render();
-            }
-        }
+        // glm::mat4 trans(1.0f);
+        // trans = glm::translate(trans, glm::vec3(0.0f, 3.0f, 0.0f));
+        // shader.setMatrix4("model", trans);
+        // // myTex.bind();
+        // textures::DIRT_BLOCK.bind();
+        // meshes::CUBE->render();
+
+        chunk.render(shader, 0, 0);
 
         for (WorldObject& rose : roses) {
             rose.render(shader);
@@ -170,7 +184,7 @@ int main()
     // Clean up resources
 
     meshes::destroy();
-    textures::destroy();
+    // textures::destroy();
 
     return 0;
 }

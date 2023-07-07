@@ -6,9 +6,11 @@
 class Texture {
 private:
     int width, height, nrChannels;
-    unsigned char* data;
     unsigned int texture;
 public:
+    /* DANGEROUS */
+    Texture(); // default constructor leaves everything uninitialized
+
     Texture(std::string const& imagePath);
     ~Texture();
 
